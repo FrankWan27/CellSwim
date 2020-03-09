@@ -3,6 +3,7 @@ import sys
 import os
 from cell import Cells
 from defs import *
+from food import Foods
 
 # PyInstaller adds this attribute
 if getattr(sys, 'frozen', False):
@@ -23,6 +24,7 @@ def startSimulation():
     gameTime = 0
 
     cells = Cells(gameDisplay)
+    foods = Foods(gameDisplay)
 
     while runloop:    
         gameDisplay.fill(LIGHT_BLUE)
@@ -31,16 +33,24 @@ def startSimulation():
         gameTime += dt    
         #Break loop if we quit
         runloop = handleInput()
+        
+        foods.update(dt, cells)
 
         if(cells.update(dt) <= 0):
-            cells.evolve()
-
+            resetGame(cells, foods)
+            gameTime = 0
         showDebug(gameDisplay, dt, gameTime, cells)
 
         pygame.display.update()
 
     pygame.display.quit()
     pygame.quit()
+
+def resetGame(cells, foods):
+    cells.evolve()
+    foods.reset()
+
+
 
 def showLabel(gameDisplay, data, text, x, y):
     font = pygame.font.Font(os.path.join(CurrentPath, 'fonts/abel.ttf'), 20)
